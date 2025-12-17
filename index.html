@@ -78,6 +78,17 @@
             border-radius: 8px;
             animation: slideIn 0.5s ease-out;
         }
+        .matrix-table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            font-family: monospace;
+        }
+        .matrix-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            background: #fff;
+        }
         canvas {
             max-width: 100%;
             height: 400px;
@@ -157,6 +168,23 @@
             return math.transpose(math.matrix(cofactorMatrix));
         }
         
+        // Fungsi helper untuk format matriks sebagai tabel HTML
+        function formatMatrixAsTable(matrix) {
+            const rows = matrix._size[0];
+            const cols = matrix._size[1];
+            let tableHTML = '<table class="matrix-table">';
+            
+            for (let i = 0; i < rows; i++) {
+                tableHTML += '<tr>';
+                for (let j = 0; j < cols; j++) {
+                    tableHTML += `<td>${matrix._data[i][j]}</td>`;
+                }
+                tableHTML += '</tr>';
+            }
+            tableHTML += '</table>';
+            return tableHTML;
+        }
+        
         function calculate() {
             const matrix1Str = document.getElementById('matrix1').value;
             const matrix2Str = document.getElementById('matrix2').value;
@@ -187,28 +215,28 @@
                     } else if (op === 'multiply') {
                         resultMatrix = math.multiply(matrix1, matrix2);
                     }
-                    result = math.format(resultMatrix);
+                    result = formatMatrixAsTable(resultMatrix);  // Tampilkan sebagai tabel
                 } else if (op === 'determinant') {
                     if (matrix1._size[0] !== matrix1._size[1]) {
                         throw new Error('Determinan hanya untuk matriks persegi.');
                     }
-                    result = math.det(matrix1);
+                    result = `<strong>Determinan:</strong> ${math.det(matrix1)}`;
                     resultMatrix = null;
                 } else if (op === 'inverse') {
                     if (matrix1._size[0] !== matrix1._size[1]) {
                         throw new Error('Invers hanya untuk matriks persegi.');
                     }
                     resultMatrix = math.inv(matrix1);
-                    result = math.format(resultMatrix);
+                    result = formatMatrixAsTable(resultMatrix);  // Tampilkan sebagai tabel
                 } else if (op === 'adjoint') {
                     if (matrix1._size[0] !== matrix1._size[1]) {
                         throw new Error('Adjoint hanya untuk matriks persegi.');
                     }
-                    resultMatrix = calculateAdjoint(matrix1);  // Gunakan fungsi manual
-                    result = math.format(resultMatrix);
+                    resultMatrix = calculateAdjoint(matrix1);
+                    result = formatMatrixAsTable(resultMatrix);  // Tampilkan sebagai tabel
                 }
                 
-                document.getElementById('output').innerHTML = `<strong>Hasil:</strong> <pre>${result}</pre>`;
+                document.getElementById('output').innerHTML = `<strong>Hasil:</strong><br>${result}`;
                 if (resultMatrix) {
                     plotHeatmap(resultMatrix);
                 } else {
